@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.springProject.subProject.mapper.PaymentMapper">
+	
+	<!-- 정기결제 -->
+
+	<!-- 주문표 -->
+	<insert id="insertOrderPad">
+		INSERT INTO order_pad VALUES((select order_num from(SELECT IFNULL(max(CAST(order_num as unsigned)),0)+1 as order_num from order_pad where order_mem_id=#{order_mem_id} AND order_pd_code = #{order_pd_code})tmp),
+		#{order_mem_id},#{order_pd_code},'1',#{order_qty},#{order_postcode},#{order_address},#{order_phoneNum})
+	</insert>
+	
+	<!-- 결제 정보 가져오기 -->
+	<select id="getPayInfo" resultType="com.springProject.subProject.vo.PayInfoVO">
+		SELECT pd_name,(p.pd_price*o.order_qty) as amount,mem_email,mem_name,mem_phoneNum,order_address,order_postcode 
+		FROM member m JOIN order_pad o 
+		ON m.mem_id = o.order_mem_id
+		JOIN product p ON o.order_pd_code = p.pd_code
+		WHERE order_mem_id=#{order_mem_id} AND order_pd_code=#{order_pd_code} AND order_num=(SELECT MAX(order_num) FROM order_pad WHERE order_mem_id=#{order_mem_id})
+	</select>
+	<!-- 주문표 상태 변결 -->
+	<update id="updateSubStatus">
+		UPDATE order_pad SET order_status ='2' WHERE order_mem_id=#{mem_id} AND 
+		(select order_num from(SELECT max(CAST(order_num as unsigned)) as order_num from order_pad where order_mem_id=#{mem_id})tmp)
+	</update>
+	
+	<!-- 일반결제 -->
+
+	<!-- 장바구니에서 주문표 -->
+	<insert id="insertBasketOrderPad">
+		INSERT INTO order_pad VALUES((select order_num from(SELECT IFNULL(max(CAST(order_num as unsigned)),0)+1 as order_num from order_pad where order_mem_id=#{bk_mem_id} AND order_pd_code = #{bk_pd_code})tmp),
+		#{bk_mem_id},#{bk_pd_code},'1',#{bk_qty},
+		(select mem_postcode from (SELECT mem_postcode from member where mem_id = #{bk_mem_id}) tmpp),
+		(select mem_address from (SELECT mem_address from member where mem_id = #{bk_mem_id}) tmpa),
+		(select mem_phoneNum from (SELECT mem_phoneNum from member where mem_id = #{bk_mem_id}) tmppn)
+		)
+	</insert>
+	<!-- 주문표가져오기 장바구니  -->
+	<select id="getOrderPad" resultType="com.springProject.subProject.vo.Order_padVO">
+		SELECT * FROM order_pad WHERE order_mem_id=#{bk_mem_id} AND order_pd_code=#{bk_pd_code} AND order_status='1'
+	</select>
+	
+	<!-- 결재롼료 후 orderPad status변경 -->
+	<update id="updateStatus">
+		UPDATE order_pad SET order_status ='2' WHERE order_mem_id=#{bk_mem_id} AND order_pd_code=#{bk_pd_code} AND 
+		(select order_num from(SELECT IFNULL(max(CAST(order_num as unsigned)),0)+1 as order_num from order_pad where order_mem_id=#{bk_mem_id} AND order_pd_code = #{bk_pd_code})tmp) 
+	</update>
+	
+	<!-- 결제완료 후 장바구니 비우기 -->
+	<delete id="deleteOrderCheck">
+		DELETE FROM basket WHERE bk_mem_id = #{bk_mem_id}
+	</delete>
+	
+	
+</mapper>

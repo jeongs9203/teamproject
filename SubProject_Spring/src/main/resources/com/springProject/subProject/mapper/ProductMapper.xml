@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.springProject.subProject.mapper.MapperStore">
+	<select id="selectProductListCount" resultType="java.lang.Integer">
+		SELECT COUNT(*) FROM product
+	</select>
+	
+	<select id="selectProductList" resultType="com.springProject.subProject.vo.ProductVO">
+		SELECT * FROM product 
+		<choose>
+			<when test="select.equals('') or select.equals('pre')">
+				ORDER BY DATE_FORMAT(pd_rdate, '%y%m%d') DESC 
+			</when>
+			<when test="!select.equals('') and select.equals('avg')">
+				ORDER BY CONVERT(pd_re_avg, SIGNED INTEGER) DESC	
+			</when>
+			<when test="!select.equals('') and select.equals('hei')">
+				ORDER BY CONVERT(pd_price, SIGNED INTEGER) DESC
+			</when>
+			<when test="!select.equals('') and select.equals('low')">
+				ORDER BY CONVERT(pd_price, SIGNED INTEGER) ASC
+			</when>
+		</choose>
+		LIMIT #{pageInfo.startRow}, #{pageInfo.listLimit}
+	</select>
+	<select id="selectProductDetail" resultType="com.springProject.subProject.vo.ProductVO">
+		SELECT * FROM product WHERE pd_code = #{pd_code}
+	</select>
+	
+	<select id="selectProductReviewList" resultType="com.springProject.subProject.vo.ReviewVO">
+		SELECT * FROM review WHERE re_pd_code = (SELECT pd_code FROM product WHERE pd_code = #{pd_code}) 
+		<choose>
+			<when test="choice.equals('최신순') or choice.equals('')">
+				ORDER BY DATE_FORMAT(re_rdate, '%y%m%d') DESC 
+			</when>
+			<when test="choice.equals('평점순')">
+				ORDER BY CONVERT(re_score, SIGNED INTEGER) DESC 	
+			</when>
+		</choose>
+		LIMIT 0, 5
+	</select>
+	
+	<select id="selectReviewCount" resultType="java.lang.Integer">
+		SELECT COUNT(*) FROM review WHERE re_pd_code = #{pd_code};
+	</select>
+	
+	<select id="selectReviewAvg" resultType="java.lang.Integer">
+		SELECT IFNULL(ROUND(AVG(re_score), 0),0) FROM review WHERE re_pd_code = #{pd_code};
+	</select>
+	
+	<!-- 장바구니 확인 -->
+	<select id="selectOrderNum" resultType="java.lang.Integer">
+		SELECT IFNULL(MAX(bk_order_num),0) FROM basket WHERE bk_mem_id=#{mem_id} AND bk_pd_code=#{pd_code}
+	</select>
+	
+	 <!-- 제품상세에서 장바구니넣기 -->
+	<insert id="insertBasket">
+		INSERT INTO basket VALUES('1',#{mem_id},#{pd_code},#{bk_qty})
+	</insert>
+	
+	<!-- 제품상세에서 장바구니 업데이트 -->
+	<update id="updateBasket">
+		UPDATE basket SET bk_qty=#{bk_qty} WHERE bk_mem_id = #{mem_id} AND bk_order_num = #{bk_order_num} AND bk_pd_code= #{pd_code}	
+	</update>
+	
+</mapper>

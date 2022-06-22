@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:mybatis-spring="http://mybatis.org/schema/mybatis-spring"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:task="http://www.springframework.org/schema/task"
+	xsi:schemaLocation="http://mybatis.org/schema/mybatis-spring http://mybatis.org/schema/mybatis-spring-1.2.xsd
+		http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd
+		http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd">
+	<task:annotation-driven />
+	<task:scheduler id="ServiceScheduler" pool-size="10"/>
+	<!-- Root Context: defines shared resources visible to all other web components -->
+	<!-- hikariCP -->
+	<bean id="hikariConfig" class="com.zaxxer.hikari.HikariConfig">
+		<property name="driverClassName" value="com.mysql.cj.jdbc.Driver"></property>
+		<property name="jdbcUrl" value="jdbc:mysql://localhost:3306/subscribeproject"></property>
+		<property name="username" value="root"></property>
+		<property name="password" value="1234"></property>
+	</bean>
+	<bean id="dataSource" class="com.zaxxer.hikari.HikariDataSource" destroy-method="close">
+		<constructor-arg ref="hikariConfig"></constructor-arg>
+	</bean>
+	<!-- SQLsessionFactory 객체 설정 Mybatis와 Spring을 연결 
+	*dataSource 객체 설정이 완료되어 있어야함 -->
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource"></property>
+		<property name="configLocation" value="classpath:/mybatis_config.xml"></property>
+		<property name="mapperLocations" value="classpath:/com/springProject/subProject/mapper/*Mapper.xml"></property>
+	</bean>
+	
+		
+	<!-- MyBatis연동에 사용될 객체들의 패키지위치 지정(기본 루트 패키지 지정)  -->
+	<mybatis-spring:scan base-package="com.springProject.subProject"/>
+	
+
+
+
+
+		
+</beans>

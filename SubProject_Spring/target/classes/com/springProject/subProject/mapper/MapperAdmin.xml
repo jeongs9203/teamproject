@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.springProject.subProject.mapper.MapperAdmin">
+	
+	
+<!-- 	회원관리 -->
+	<select id="selectMeListCount" resultType="java.lang.Integer">
+		SELECT COUNT(*) FROM member
+	</select>
+	<select id="selectMeList" resultType="com.springProject.subProject.vo.MemberVO">
+		SELECT * FROM member
+		LIMIT #{startRow}, #{listLimit}
+	</select>
+	
+	<delete id="deleteMember">
+		DELETE FROM member
+		WHERE mem_id = #{mem_id}
+	</delete>
+	
+
+<!-- 	고객센터관리 -->
+	<select id="selectCuListCount" resultType="java.lang.Integer">
+		SELECT COUNT(*) FROM qna
+	</select>
+	<select id="selectCuList" resultType="com.springProject.subProject.vo.QnaVO">
+		SELECT * FROM qna
+		ORDER BY qna_re_ref DESC, qna_re_seq ASC
+		LIMIT #{startRow}, #{listLimit}
+	</select>
+
+	
+	
+<!-- 	상품관리 -->
+	<insert id="insertProduct">
+		INSERT INTO product 
+		VALUES (#{pd_code}, #{pd_name}, #{pd_img}, #{pd_price}, #{pd_stock}, #{pd_detail},
+				now(), #{pd_state}, #{pd_sales}, #{pd_re_avg})
+	</insert>
+	
+	
+	<select id="selectPdListCount" resultType="java.lang.Integer">
+		SELECT COUNT(*) FROM product
+	</select>
+	
+	
+	<select id="selectPdList" resultType="com.springProject.subProject.vo.ProductVO">
+		SELECT * FROM product
+		ORDER BY pd_rdate DESC
+		LIMIT #{startRow}, #{listLimit}
+	</select>
+
+
+	<select id="selectDetail" resultType="com.springProject.subProject.vo.ProductVO">
+		SELECT * FROM product
+		WHERE pd_code = #{pd_code}
+	</select>
+
+
+	<delete id="deleteProduct">
+		DELETE FROM product
+		WHERE pd_code = #{pd_code}
+	</delete>
+	
+	<update id="updateProduct">
+		UPDATE product
+		SET pd_name = #{pd_name}, pd_price = #{pd_price}, pd_detail = #{pd_detail}
+		WHERE pd_code = #{pd_code}
+	</update>
+
+</mapper>

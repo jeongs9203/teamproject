@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.springProject.subProject.mapper.MapperCustomer">
+	<select id="selectMaxNum" resultType="java.lang.Integer">
+		SELECT MAX(qna_num) FROM qna
+	</select>  
+	<insert id="insertBoard">
+		INSERT INTO qna 
+		VALUES (#{qna_num}, #{qna_mem_id}, #{qna_pass}, #{qna_title}, #{qna_content},
+				#{qna_re_ref}, #{qna_re_lev}, #{qna_re_seq}, now())
+	</insert>
+	<select id="selectListCount" resultType="java.lang.Integer">
+		SELECT COUNT(*) FROM qna
+		<choose>
+			<when test="!keyword.equals('') and searchType.equals('subject')">
+				WHERE qna_title LIKE #{keyword}
+			</when>
+			<when test="!keyword.equals('') and searchType.equals('content')">
+				WHERE qna_content LIKE #{keyword}
+			</when>
+			<when test="!keyword.equals('') and searchType.equals('subject_content')">
+				WHERE qna_title LIKE #{keyword} OR qna_content LIKE #{keyword}
+			</when>
+			<when test="!keyword.equals('') and searchType.equals('name')">
+				WHERE qna_mem_id LIKE #{keyword}
+			</when>
+		</choose>
+	</select>
+	<select id="selectList" resultType="com.springProject.subProject.vo.QnaVO">
+		SELECT * FROM qna
+		<choose>
+			<when test="!keyword.equals('') and searchType.equals('subject')">
+				WHERE qna_title LIKE #{keyword}
+			</when>
+			<when test="!keyword.equals('') and searchType.equals('content')">
+				WHERE qna_content LIKE #{keyword}
+			</when>
+			<when test="!keyword.equals('') and searchType.equals('subject_content')">
+				WHERE qna_title LIKE #{keyword} OR qna_content LIKE #{keyword}
+			</when>
+			<when test="!keyword.equals('') and searchType.equals('name')">
+				WHERE qna_mem_id LIKE #{keyword}
+			</when>
+		</choose>
+		ORDER BY qna_re_ref DESC, qna_re_seq ASC
+		LIMIT #{pageInfo.startRow}, #{pageInfo.listLimit}
+	</select>
+	<!-- 5. 글 상세내용 조회 -->
+	<select id="selectDetail" resultType="com.springProject.subProject.vo.QnaVO">
+		SELECT * FROM qna
+		WHERE qna_num = #{qna_num}
+	</select>
+	<delete id="deleteBoard">
+		DELETE FROM qna
+		WHERE qna_num = #{qna_num}
+	</delete>
+	<update id="updateBoard">
+		UPDATE qna
+		SET qna_mem_id = #{qna_mem_id}, qna_title = #{qna_title}, qna_content = #{qna_content}
+		WHERE qna_num = #{qna_num} AND qna_pass = #{qna_pass}
+	</update>
+	<update id="updateBoardReSeq">
+		UPDATE qna
+		SET qna_re_seq = qna_re_seq + 1
+		WHERE qna_re_ref = #{qna_re_ref} AND qna_re_seq > #{qna_re_seq}
+	</update>
+</mapper>

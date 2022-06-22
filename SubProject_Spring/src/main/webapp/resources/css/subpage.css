@@ -1,0 +1,133 @@
+@charset "UTF-8";
+
+#pageList {
+	margin: auto;
+	width: 1024px;
+	text-align: center;
+}
+
+#pageList a {
+	text-decoration: none;
+}
+
+.card {
+	margin-bottom: 5px;
+}
+
+#sum {
+	font-size: 30px;
+	border: none;
+	text-align: right;
+	outline: none;
+}
+
+.modal-dialog.modal-80size {
+  width: 80%;
+  height: 80%;
+  margin: 0;
+  padding: 0;
+}
+
+.modal-content.modal-80size {
+  height: auto;
+  min-height: 80%;
+}
+
+/* 팝업창 위치 센터 정렬 */
+.modal {
+   	text-align: center;
+}
+ 
+@media screen and (min-width: 768px) { 
+	.modal:before {
+        display: inline-block;
+        vertical-align: middle;
+        content: " ";
+        height: 100%;
+	}
+}
+ 
+.modal-dialog{
+    display: inline-block;
+    text-align: left;
+    vertical-align: middle;
+}
+
+#image {
+	float: left;
+}
+
+#na{
+	float: left;
+}
+
+#cr {
+	text-align: center;
+}
+
+#na {
+	margin: 0px 20px 0px;
+	font-size: 15px;
+	font-weight: bold;
+}
+
+#btn {
+	margin: 0px auto;
+}
+
+.nav{
+	position: sticky;
+	top: 0;
+	background: #FFFFFF;
+}
+/* #middle_nav{ */
+/*   position: sticky; */
+/*   top: 0; */
+/* } */
+#middle_nav a{
+	color: 	#696969;
+}
+
+#middle_nav a:hover{
+	background: #696969;
+	color: #FFFAFA;
+}
+
+table {
+	margin: 0px auto;
+}
+
+.tab-content {
+  text-align: center;
+}
+
+.tab-pane fade {
+  display: inline-block;
+}
+
+td{
+	text-align: left;
+}
+
+.modal-footer input {
+	margin: 0px auto;
+}
+
+/* 별점 */
+
+#star fieldset{
+    display: inline-block;
+    direction: rtl;
+    border:0;
+}
+#star label{
+    font-size: 1.5em;
+    color: transparent;
+    text-shadow: 0 0 0 rgba(250, 208, 0, 0.99);
+}
+
+#count {
+	font-size: 15px;
+	font-weight: bold;
+	color: gray;
+}

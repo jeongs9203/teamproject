@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.springProject.subProject.mapper.MemberMapper">
+	<!-- 로그인시 아이디,비밀번호 확인 -->
+<!-- 	<select id="searchUser" resultType="com.springProject.subProject.vo.MemberVO"> -->
+<!-- 		SELECT * FROM member WHERE mem_id=#{mem_id} AND mem_password=#{mem_password} -->
+<!-- 	</select> -->
+	
+	<!-- 로그인 -->
+	<select id="getFindId" resultType="com.springProject.subProject.vo.MemberVO">
+		SELECT * FROM member WHERE mem_id=#{mem_id}
+	</select>
+	<!-- 로그인 성공시 인증 여부 판별 -->
+	<select id="searchAuthStatus" resultType="java.lang.String">
+		SELECT mem_auth FROM member WHERE mem_id = #{mem_id}
+	</select>
+	
+	<select id="selectUserInfo" resultType="com.springProject.subProject.vo.MemberVO">
+		select * FROM member WHERE mem_email = #{email}
+	</select>
+	
+	<insert id="insertKakaoId">
+		INSERT INTO member VALUES(#{id},"",#{userInfo.kakao_account.profile.nickname},"",#{gender},#{userInfo.kakao_account.email},"","","",'normal','0','null', 'N')
+	</insert>
+	
+	<insert id="insertNaverId">
+		INSERT INTO member VALUES(#{id}, "", #{userInfo.response.name}, #{userInfo.response.birthday}, #{userInfo.response.gender}, #{userInfo.response.email}, #{userInfo.response.mobile}, "" ,"", 'normal', '0', 'null', 'N')
+	</insert>
+	
+	<!-- 회원가입 -->
+	<insert id="insertMember">
+		INSERT INTO member VALUES(#{mem_id},#{mem_password},#{mem_name},#{mem_birth},#{mem_gender},#{mem_email},#{mem_phoneNum},#{mem_postcode},#{mem_address},'normal','0','null','N')
+	</insert>
+	
+	<!-- 회원인증조회 -->
+	<select id="authInfo" resultType="java.lang.String">
+		SELECT mem_auth_code FROM member_auth WHERE mem_id = #{mem_id}
+	</select>
+	<insert id="insertAutoInfo">
+		INSERT INTO member_auth VALUES(#{mem_id},#{mem_auth_code})
+	</insert>
+	<update id="updateAuthInfo">
+		UPDATE member_auth SET mem_auth_code = #{mem_auth_code} WHERE mem_id = #{mem_id}
+	</update>
+	<!-- 인증 후 인증코드 삭제 -->
+	<delete id="deleteAuth">
+		DELETE FROM member_auth WHERE mem_id = #{mem_id}
+	</delete>
+	<!-- 인증성공 시 -->
+	<update id="updateAuth">
+		UPDATE member SET mem_auth = 'Y' WHERE mem_id = #{mem_id}
+	</update>
+	<!-- 아이디 증복확인 -->
+	<select id="isDuplicate" resultType="java.lang.String">
+		SELECT mem_id FROM member WHERE mem_id = #{id}
+	</select>
+	
+	<!-- 마이페이지 조회 -->
+	<select id="selectMyPage" resultType="com.springProject.subProject.vo.MemberVO">
+		SELECT * FROM member WHERE mem_id = #{id}
+	</select>
+	
+	<!-- 회원 정보 수정 -->
+	<update id="updateMember">
+		UPDATE member
+		SET mem_email = #{mem_email}, mem_phoneNum = #{mem_phoneNum}, mem_postcode = #{mem_postcode}, mem_address = #{mem_address}
+		WHERE mem_id = #{mem_id}
+	</update>
+	
+	<!-- 아이디 찾기 -->
+	<select id="selectSearchId" resultType="java.lang.String">
+		SELECT mem_id FROM member
+		WHERE mem_name=#{mem_name} AND
+		mem_phoneNum=#{mem_phoneNum}
+	</select>
+
+	<!-- 비밀번호 찾기 -->
+	<select id="selectSearchPass" resultType="java.lang.String">
+		SELECT * FROM member
+		<choose>
+			<when test="mem_email.equals('')">
+				WHERE mem_name=#{mem_name} AND
+				mem_phoneNum=#{mem_phoneNum}
+			</when>
+			<when test="mem_phoneNum.equals('')">
+				WHERE mem_name=#{mem_name} AND mem_email=#{mem_email}
+			</when>
+		</choose>
+	</select>
+
+	<!-- 비밀번호 변경 -->
+	<update id="updatePass">
+		UPDATE member SET mem_password = #{mem_password}
+		<choose>
+			<when test="mem_email.equals('')">
+				WHERE mem_name=#{mem_name} AND
+				mem_phoneNum=#{mem_phoneNum}
+			</when>
+			<when test="mem_phoneNum.equals('')">
+				WHERE mem_name=#{mem_name} AND mem_email=#{mem_email}
+			</when>
+		</choose>
+	</update>
+	
+	
+	
+	<!-- 장바구니 불러오기 -->
+	<select id="selectMyBasket" resultType="com.springProject.subProject.vo.BasketListVO">
+       SELECT * FROM basket_list WHERE bk_mem_id = #{id}
+    </select>
+    
+    <!-- 장바구니 수량변경 -->
+    <update id="updateBasket">
+    	UPDATE basket SET bk_qty=#{bk_qty} WHERE bk_mem_id=#{bk_mem_id} AND bk_order_num=#{bk_order_num} AND bk_pd_code=#{bk_pd_code} 
+    </update>
+    
+    <!-- 장바구니 물품 삭제 -->
+    <delete id="deleteMyBasket">
+         DELETE FROM basket WHERE bk_pd_code = #{bk_pd_code} AND bk_mem_id = #{bk_mem_id} AND bk_order_num = #{bk_order_num}
+   </delete>
+   
+   <select id="isInquiry" resultType="java.lang.String">
+   		SELECT CASE WHEN RESULT=0 THEN '주문내역이 없습니다' END AS COMMENT FROM (SELECT COUNT(*) AS RESULT FROM ORDER_CHECK WHERE order_mem_id=#{mem_id}) A
+   </select>
+   
+   <select id="loadInquiry" resultType="com.springProject.subProject.vo.Order_checkVO">
+   		SELECT * FROM order_check WHERE order_mem_id =#{mem_id}
+   </select>
+   <!-- 회원탈퇴 -->
+   <delete id="memberDelete">
+   		DELETE FROM member WHERE mem_id = #{mem_id}
+   </delete>
+</mapper>
